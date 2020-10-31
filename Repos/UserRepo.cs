@@ -15,7 +15,7 @@ namespace Api.Repos
             this.Context = context;
 
         }
-        public async  Task<IEnumerable<AppUser>> AllUsers()
+        public async Task<IEnumerable<AppUser>> AllUsers()
         {
             return await Context.Users.ToListAsync();
         }

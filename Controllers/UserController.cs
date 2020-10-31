@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UserController : ControllerBase
+   
+    public class UserController : BaseApiController
     {
         public IUserRepo _userepo { get; }
         public UserController(IUserRepo userepo)

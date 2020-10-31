@@ -7,6 +7,7 @@ namespace Api.Context
     {
         public DBContext(DbContextOptions options) : base(options)
         { }
+        
         public DbSet<AppUser> Users { get; set; }
     }
 }

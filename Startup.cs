@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Context;
+using Api.Extensions;
+using Api.Interface;
 using Api.Repos;
-
+using Api.Service;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -19,19 +22,26 @@ namespace Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IConfiguration _config;
+
+        public Startup(IConfiguration config)
         {
-            Configuration = configuration;
+            _config = config;
         }
 
-        public IConfiguration Configuration { get; }
+         
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationServices(_config);
             services.AddControllers();
-            services.AddDbContext<DBContext>(opt => opt.UseMySQL(Configuration.GetConnectionString("dbConnection")));
-            services.AddScoped<IUserRepo,UserRepo>();
+            services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<IAccountRepo, AccountRepo>();
+            services.AddCors();
+            services.AddIdentityServices(_config);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,7 +55,8 @@ namespace Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
