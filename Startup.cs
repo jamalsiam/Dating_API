@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Api.Context;
 using Api.Extensions;
 using Api.Interface;
+using Api.Middlewares;
 using Api.Repos;
 using Api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -29,11 +30,12 @@ namespace Api
             _config = config;
         }
 
-         
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddApplicationServices(_config);
             services.AddControllers();
             services.AddScoped<IUserRepo, UserRepo>();
@@ -47,6 +49,7 @@ namespace Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<ExceptionMiddleware>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
