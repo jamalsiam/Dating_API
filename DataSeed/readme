@@ -1,0 +1,34 @@
+https://www.json-generator.com/
+https://randomuser.me/
+
+
+  
+
+
+
+[
+  '{{repeat(5)}}',
+  {
+    UserName:'{{firstName("female")}}',
+    DateOfBirth:'{{date(new Date(1950, 0, 1),  new Date(2000, 0, 1), "YYYY-MM-dd")}}',
+    FirstName: function(){return this.UserName;},
+    LastName:'{{firstName("male")}}',
+    CreatedAt:'{{date(new Date(2019, 0, 1),  new Date(2020, 0, 1), "YYYY-MM-dd")}}',
+    LastActive:'{{date(new Date(2020, 0, 1), new Date(), "YYYY-MM-dd")}}',
+    Gender:false,
+    Intersts:'{{ lorem(2, "words")}}',
+    Introduction:'{{lorem(20, "words")}}',
+    City:'{{city()}}',
+    Country:'{{country()}}',
+    Photos:[
+        '{{repeat(3)}}',
+      {
+      Url: function(num){return 'https://randomuser.me/api/portraits/women/'+num.integer(1,100)+'.jpg';},
+      IsMain: false
+    }
+    ]
+    
+    
+  }
+]
+ 
