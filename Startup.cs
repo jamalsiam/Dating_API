@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.Context;
 using Api.Extensions;
+using Api.Helpers;
 using Api.Interface;
 using Api.Middlewares;
 using Api.Repos;
 using Api.Service;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,12 +38,14 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddApplicationServices(_config);
             services.AddControllers();
             services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<IAccountRepo, AccountRepo>();
             services.AddCors();
             services.AddIdentityServices(_config);
+
 
 
         }

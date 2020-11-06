@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Api.Dtos;
 using Api.Entities;
 using Api.Repos;
 using Microsoft.AspNetCore.Authorization;
@@ -17,17 +18,17 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppUser>>> AllUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> AllMembers()
         {
-            return Ok(await _userepo.AllUsers());
+            return Ok(await _userepo.AllMembers());
         }
 
         [AllowAnonymous]
         [HttpGet("{Id}")]
-        public async Task<ActionResult<AppUser>> GetUser(int Id)
+        public async Task<ActionResult<MemberDto>> GetMember(int Id)
         {
-            // await Seed.SeedUsers(DBContext);
-            return Ok(await _userepo.GetUser(Id));
+            
+            return Ok(await _userepo.GetMember(Id));
         }
 
 
