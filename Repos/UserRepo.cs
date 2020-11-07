@@ -56,8 +56,9 @@ namespace Api.Repos
              .Where(member =>
               member.UserName.Contains(text) ||
               member.FirstName.Contains(text) ||
-              member.LastName.Contains(text) )
+              member.LastName.Contains(text))
              .ProjectTo<MemberDto>(mapper.ConfigurationProvider)
+             .Take(10)
              .ToListAsync();
         }
     }
