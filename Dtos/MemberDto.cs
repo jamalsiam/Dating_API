@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
- 
+using Api.Entities;
 
 namespace Api.Dtos
 {

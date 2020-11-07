@@ -49,5 +49,16 @@ namespace Api.Repos
             return await Context.Users.FindAsync(Id);
         }
 
+        public async Task<IEnumerable<MemberDto>> GetMembersByText(string text)
+        {
+            return await Context
+             .Users
+             .Where(member =>
+              member.UserName.Contains(text) ||
+              member.FirstName.Contains(text) ||
+              member.LastName.Contains(text) )
+             .ProjectTo<MemberDto>(mapper.ConfigurationProvider)
+             .ToListAsync();
+        }
     }
 }
