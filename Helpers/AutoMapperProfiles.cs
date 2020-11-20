@@ -24,6 +24,7 @@ namespace Api.Helpers
                  DateOfBirth.CalculateAge()));
 
             CreateMap<Photo, PhotoDto>();
+            CreateMap<MemberUpdateDto, AppUser>().ReverseMap();
 
         }
     }

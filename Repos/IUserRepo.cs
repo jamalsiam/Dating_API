@@ -13,6 +13,9 @@ namespace Api.Repos
         Task<IEnumerable<MemberDto>> AllMembers();
         Task<IEnumerable<MemberDto>> GetMembersByText(string text);
         Task<MemberDto> GetMember(int Id);
-
+       void Update(AppUser member);
+        Task<AppUser> GetUserByUsername(string username);
+        Task<bool> SaveChanges();
+       
     }
 }

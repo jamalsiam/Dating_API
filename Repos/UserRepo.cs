@@ -61,5 +61,25 @@ namespace Api.Repos
              .Take(10)
              .ToListAsync();
         }
+
+     
+        public async Task<AppUser> GetUserByUsername(string username)
+        {
+            return await Context
+            .Users
+            .Where(member => member.UserName == username)
+            
+            .SingleOrDefaultAsync();
+        }
+        public void Update(AppUser member)
+        {
+           Context.Entry(member).State = EntityState.Modified;
+        }
+
+        public async Task<bool> SaveChanges()
+        {
+            return await Context.SaveChangesAsync() > 0;
+        }
+
     }
 }

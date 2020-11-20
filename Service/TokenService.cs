@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Service
 {
-    public class TokenService : ITokenService
+   public class TokenService : ITokenService
     {
         private readonly SymmetricSecurityKey _key;
         public TokenService(IConfiguration config)
@@ -21,13 +21,15 @@ namespace Api.Service
         {
             var claims = new List<Claim>
             {
-                new Claim (JwtRegisteredClaimNames.NameId,appUser.UserName)
+                new Claim(JwtRegisteredClaimNames.NameId, appUser.UserName)
+
             };
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(7),
+                SigningCredentials = creds
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -35,4 +37,4 @@ namespace Api.Service
             return tokenHandler.WriteToken(token);
         }
     }
-}
+} 
