@@ -23,7 +23,7 @@ namespace Api.Helpers
                  MapFrom(prop => prop.
                  DateOfBirth.CalculateAge()));
 
-            CreateMap<Photo, PhotoDto>();
+            CreateMap<Photo, PhotoDto>().ReverseMap();
             CreateMap<MemberUpdateDto, AppUser>().ReverseMap();
 
         }

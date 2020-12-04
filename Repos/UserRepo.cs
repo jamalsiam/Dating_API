@@ -67,8 +67,9 @@ namespace Api.Repos
         {
             return await Context
             .Users
+            .Include(a=> a.Photos)
             .Where(member => member.UserName == username)
-            
+         
             .SingleOrDefaultAsync();
         }
         public void Update(AppUser member)

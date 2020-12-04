@@ -1,25 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Api.Context;
+
 using Api.Extensions;
-using Api.Helpers;
-using Api.Interface;
 using Api.Middlewares;
-using Api.Repos;
-using Api.Service;
-using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Api
 {
@@ -38,15 +24,9 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddApplicationServices(_config);
             services.AddControllers();
-            services.AddScoped<IUserRepo, UserRepo>();
-            services.AddScoped<IAccountRepo, AccountRepo>();
-            services.AddCors();
             services.AddIdentityServices(_config);
-
-
 
         }
 
