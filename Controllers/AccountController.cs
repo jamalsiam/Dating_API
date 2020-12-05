@@ -29,6 +29,7 @@ namespace Api.Controllers
             }
             return Ok(new UserDto
             {
+                Id = user.Id,
                 Username = user.UserName,
                 Token = TokenService.CreateToken(user)
             });
@@ -43,6 +44,7 @@ namespace Api.Controllers
             {
                 return Ok(new UserDto()
                 {
+                    Id = user.Id,
                     Username = user.UserName,
                     Token = TokenService.CreateToken(user)
                 });
