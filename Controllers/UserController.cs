@@ -21,7 +21,7 @@ namespace Api.Controllers
         private readonly IPhotoService _photoService;
         private readonly IUserRepo _userepo;
         private readonly IMapper _mapper;
- 
+
         public UserController(IUserRepo userepo,
                               IMapper mapper,
                               IPhotoService PhotoService)
@@ -57,7 +57,7 @@ namespace Api.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
         {
-        
+
             var user = await _userepo.GetUserByUsername(User.GetUsername());
 
             _mapper.Map(memberUpdateDto, user);
@@ -90,14 +90,18 @@ namespace Api.Controllers
 
 
                 user.Photos.Add(photo);
+                var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
+                if (currentMain != null) currentMain.IsMain = false;
+                photo.IsMain = true;
 
                 if (await _userepo.SaveChanges())
                 {
-                    return NoContent();
+                    var MappedPhoto = _mapper.Map<PhotoDto>(photo);
+                    return Ok(MappedPhoto);
                 }
 
 
-               
+
             }
             catch (Exception e)
             {
