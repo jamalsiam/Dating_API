@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Api.Interface;
 using System.Linq;
 using System;
+using Api.Helpers;
 
 namespace Api.Controllers
 {
@@ -32,9 +33,17 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDto>>> AllMembers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> AllMembers([FromQuery] UserParams userParams)
         {
-            return Ok(await _userepo.AllMembers());
+             var user = await _userepo.GetUserByUsername(User.GetUsername());
+            userParams.CurrentUsername = user.UserName;
+
+
+            var users = await _userepo.AllMembers(userParams);
+
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, 
+                users.TotalCount, users.TotalPages);
+            return Ok(users);
         }
 
 
@@ -105,7 +114,7 @@ namespace Api.Controllers
             }
             catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
             return BadRequest("Problem addding photo");
         }

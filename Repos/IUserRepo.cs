@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Dtos;
 using Api.Entities;
+using Api.Helpers;
 
 namespace Api.Repos
 {
@@ -10,7 +11,7 @@ namespace Api.Repos
         Task<IEnumerable<AppUser>> AllUsers();
         Task<AppUser> GetUser(int Id);
 
-        Task<IEnumerable<MemberDto>> AllMembers();
+        Task<PagedList<MemberDto>> AllMembers(UserParams userParams);
         Task<IEnumerable<MemberDto>> GetMembersByText(string text);
         Task<MemberDto> GetMember(int Id);
        void Update(AppUser member);
