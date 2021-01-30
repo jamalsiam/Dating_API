@@ -20,6 +20,10 @@ namespace Api.Entities
         public string City { get; set; }
         public string Country { get; set; }
         public ICollection<Photo> Photos { get; set; }
+        public ICollection<UserFollow> Followings { get; set; }
+        public ICollection<UserFollow> Followers { get; set; }
+
+        
  
     }
 }

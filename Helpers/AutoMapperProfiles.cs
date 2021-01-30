@@ -25,6 +25,10 @@ namespace Api.Helpers
 
             CreateMap<Photo, PhotoDto>().ReverseMap();
             CreateMap<MemberUpdateDto, AppUser>().ReverseMap();
+            CreateMap<UserFollow, FollowAddDto>().ReverseMap();
+            CreateMap<UserFollow, FollowReadDto>().ReverseMap();
+            CreateMap<UserFollow, FollowDeleteDto>().ReverseMap();
+            CreateMap<FollowReadDto, FollowAddDto>().ReverseMap();
 
         }
     }
