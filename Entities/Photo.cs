@@ -11,5 +11,12 @@ namespace Api.Entities
         public string PublicId { get; set; }
         public AppUser AppUser { get; set; }
         public int AppUserId { get; set; }
+
+        [ForeignKey(nameof(PostId))]
+        public Post Post { get; set; } 
+        public int? PostId { get; set; }
+
+
+
     }
 }

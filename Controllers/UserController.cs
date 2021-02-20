@@ -80,7 +80,7 @@ namespace Api.Controllers
 
 
         [HttpPost("add-photo")]
-        public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
+        public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file,[FromForm] bool skipMian,[FromForm] int postId)
         {
             try
             {
@@ -94,14 +94,28 @@ namespace Api.Controllers
                 var photo = new Photo
                 {
                     Url = result.SecureUrl.AbsoluteUri,
-                    PublicId = result.PublicId
+                    PublicId = result.PublicId,
+                   
                 };
+                if (postId != 0)
+                {
+                    photo.PostId = postId;
+                }
 
+
+                if (skipMian)
+                {
+                    photo.IsMain = false;
+                    
+                }
+                else
+                {
+                    var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
+                    if (currentMain != null) currentMain.IsMain = false;
+                    photo.IsMain = true;
+                }
 
                 user.Photos.Add(photo);
-                var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
-                if (currentMain != null) currentMain.IsMain = false;
-                photo.IsMain = true;
 
                 if (await _userepo.SaveChanges())
                 {

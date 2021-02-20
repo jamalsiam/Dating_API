@@ -10,6 +10,9 @@ namespace Api.Context
 
         public DbSet<AppUser> Users { get; set; }
         public DbSet<UserFollow> Follow { get; set; }
+        
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

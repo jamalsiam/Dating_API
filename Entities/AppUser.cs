@@ -22,6 +22,9 @@ namespace Api.Entities
         public ICollection<Photo> Photos { get; set; }
         public ICollection<UserFollow> Followings { get; set; }
         public ICollection<UserFollow> Followers { get; set; }
+        public ICollection<Post> Posts { get; set; }
+
+        
 
         
  

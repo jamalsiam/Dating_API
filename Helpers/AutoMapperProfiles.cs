@@ -30,6 +30,14 @@ namespace Api.Helpers
             CreateMap<UserFollow, FollowDeleteDto>().ReverseMap();
             CreateMap<FollowReadDto, FollowAddDto>().ReverseMap();
 
+            CreateMap<Post, PostUpdateDto>().ReverseMap()
+                .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
+
+            CreateMap<Post, PostReadDto>().ReverseMap()
+           .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
+            CreateMap<Post, PostAddDto>().ReverseMap()
+            .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
+
         }
     }
 }
