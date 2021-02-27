@@ -13,6 +13,7 @@ namespace Api.Entities
         public ICollection<Photo> Photos { get; set; }
         public AppUser AppUser { get; set; }
         public int AppUserId { get; set; } 
+        public ICollection<PostLike> PostLikes { get; set; }
         
     }
 }

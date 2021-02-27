@@ -38,6 +38,10 @@ namespace Api.Helpers
             CreateMap<Post, PostAddDto>().ReverseMap()
             .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
 
+            CreateMap<PostLike, PostLikeReadDto>().ReverseMap()
+           .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
+
+
         }
     }
 }

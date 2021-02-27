@@ -10,9 +10,9 @@ namespace Api.Repos
         void AddPost(Post post);
         void DeletePost(int userId, int postId);
         void UpdatePost(PostUpdateDto post);
-        Task<PostReadDto> GetPost(int postId);
-        Task<IEnumerable<PostReadDto>> GetPosts(int userId, bool main);
-        Task<IEnumerable<PostReadDto>> GetPosts(int userId);
+        Task<PostReadDto> GetPost(int postId, int accountId);
+        Task<IEnumerable<PostReadDto>> GetPosts(int userId, int accountId ,bool main);
+        Task<IEnumerable<PostReadDto>> GetPosts(int userId, int accountId);
         Task<bool> SaveChanges();
 
     }

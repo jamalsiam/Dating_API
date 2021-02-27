@@ -20,6 +20,8 @@ namespace Api.Extensions
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IFollowRepo, FollowRepo>();
             services.AddScoped<IPostRepo, PostRepo>();
+            // services.AddScoped<IPostCommentRepo, PostCommentRepo>();
+            services.AddScoped<IPostLikeRepo, PostLikeRepo>();
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddScoped<ITokenService, TokenService>();

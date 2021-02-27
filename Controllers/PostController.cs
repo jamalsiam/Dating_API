@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Dtos;
@@ -39,7 +38,7 @@ namespace Api.Controllers
             _postRepo.AddPost(mappedPost);
             if (await _postRepo.SaveChanges())
             {
-                return Ok(await _postRepo.GetPost(mappedPost.Id));
+                return Ok(await _postRepo.GetPost(mappedPost.Id, user.Id));
 
             }
             return BadRequest("Something went wrong");
@@ -49,14 +48,15 @@ namespace Api.Controllers
         [HttpGet("{id}", Name = "GetPost")]
         public async Task<ActionResult<PostReadDto>> GetPost(int id)
         {
-            return Ok(await _postRepo.GetPost(id));
+            var user = await _userRepo.GetUserByUsername(User.GetUsername());
+            return Ok(await _postRepo.GetPost(id, user.Id));
         }
 
         [HttpPut]
         public async Task<ActionResult<PostReadDto>> UpdatePost(PostUpdateDto post)
         {
             var user = await _userRepo.GetUserByUsername(User.GetUsername());
-            var initPost = await _postRepo.GetPost(post.Id);
+            var initPost = await _postRepo.GetPost(post.Id, user.Id);
             if (user.Id != post.UserId || initPost.UserId != user.Id) return Unauthorized();
 
             _postRepo.UpdatePost(post);
@@ -73,12 +73,13 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult> GetHomePosts([FromQuery] int id, [FromQuery] bool userPost)
         {
+             var user = await _userRepo.GetUserByUsername(User.GetUsername());
             if (userPost)
             {
-                return Ok(await _postRepo.GetPosts(id, false));
+                return Ok(await _postRepo.GetPosts(id, user.Id));
             }
-            var user = await _userRepo.GetUserByUsername(User.GetUsername());
-            return Ok(await _postRepo.GetPosts(user.Id, true));
+           
+            return Ok(await _postRepo.GetPosts(user.Id, user.Id));
         }
 
         [HttpDelete("{id}")]

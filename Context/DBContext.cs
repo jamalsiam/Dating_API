@@ -10,9 +10,11 @@ namespace Api.Context
 
         public DbSet<AppUser> Users { get; set; }
         public DbSet<UserFollow> Follow { get; set; }
-        
+
         public DbSet<Post> Posts { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        // public DbSet<PostComment> PostComments { get; set; }
+        public DbSet<PostLike> PostLikes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,12 +30,12 @@ namespace Api.Context
             .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<UserFollow>()
-            .HasOne(u => u. Follower)
+            .HasOne(u => u.Follower)
             .WithMany(u => u.Followings)
             .HasForeignKey(u => u.FollowerId)
             .OnDelete(DeleteBehavior.Cascade);
 
- 
+
         }
     }
 }

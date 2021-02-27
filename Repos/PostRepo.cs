@@ -34,33 +34,34 @@ namespace Api.Repos
             Context.Posts.Remove(post);
         }
 
-        public async Task<PostReadDto> GetPost(int postId)
+        public async Task<PostReadDto> GetPost(int postId, int accountId)
         {
             var post = Context.Posts.Where(p => p.Id == postId);
-            var p = await post.FirstOrDefaultAsync();
             var phs = await Context.Photos.Where(ph => ph.PostId == postId).ToListAsync();
 
-            return await post.Select(f => f.AppUser)
-            .Select(u => new PostReadDto
+          var result =  await post
+            .Select(p => new PostReadDto
             {
                 Id = p.Id,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
                 Text = p.Text,
-                UserId = u.Id,
+                UserId = p.AppUser.Id,
                 Feeling = p.Feeling,
-                Fullname = $"{u.FirstName } {u.LastName}",
-                UserPhotoUrl = u.Photos.FirstOrDefault(p => p.IsMain).Url,
+                Fullname = $"{p.AppUser.FirstName } {p.AppUser.LastName}",
+                UserPhotoUrl = p.AppUser.Photos.FirstOrDefault(p => p.IsMain).Url,
                 Photos = Mapper.Map<ICollection<PhotoDto>>(phs),
                 Shared = false,
-                LikedByAccount = false,
-                LikesCount = 0,
+                LikedByAccount = p.PostLikes.Any(l => l.PostId == p.Id && l.AppUserId==accountId), 
+                LikesCount = p.PostLikes.Count(),
                 CommentsCount = 0,
             })
             .FirstOrDefaultAsync();
+
+            return result;
         }
 
-        public async Task<IEnumerable<PostReadDto>> GetPosts(int userId)
+        public async Task<IEnumerable<PostReadDto>> GetPosts(int userId, int accountId)
         {
 
             var posts = Context.Posts.Where(p => p.AppUserId == userId).AsQueryable();
@@ -77,8 +78,8 @@ namespace Api.Repos
                 UserPhotoUrl = p.AppUser.Photos.FirstOrDefault(ph => ph.IsMain).Url,
                 Photos = Mapper.Map<ICollection<PhotoDto>>(p.Photos.Where(ph => ph.PostId == p.Id).ToList()),
                 Shared = false,
-                LikedByAccount = false,
-                LikesCount = 0,
+                LikedByAccount = p.PostLikes.Any(l => l.PostId == p.Id && l.AppUserId==accountId), 
+                LikesCount = p.PostLikes.Count(),
                 CommentsCount = 0,
             });
             return await postsList.OrderByDescending(p => p.Id).ToListAsync();
@@ -87,9 +88,9 @@ namespace Api.Repos
 
 
 
-        public async Task<IEnumerable<PostReadDto>> GetPosts(int userId, bool category)
+        public async Task<IEnumerable<PostReadDto>> GetPosts(int userId, int accountId, bool category)
         {
-            if (!category) return await GetPosts(userId);
+            if (!category) return await GetPosts(userId, accountId);
             var postdList = new List<PostReadDto>();
             var followingsPosts = from post in Context.Posts
                                   join userfollow in Context.Follow on post.AppUserId equals userfollow.FollowerId
@@ -107,13 +108,13 @@ namespace Api.Repos
                                       Photos = Mapper.Map<ICollection<PhotoDto>>(createBy.Photos.Where(ph => ph.PostId == post.Id).ToList()),
                                       Feeling = post.Feeling,
                                       Shared = false,
-                                      LikedByAccount = false,
-                                      LikesCount = 0,
+                                      LikedByAccount = post.PostLikes.Any(l => l.PostId == post.Id && l.AppUserId==accountId), 
+                                       LikesCount = post.PostLikes.Count(),
                                       CommentsCount = 0,
                                   };
 
             postdList.AddRange(followingsPosts);
-            var accountPosts = await GetPosts(userId);
+            var accountPosts = await GetPosts(userId,accountId);
             postdList.AddRange(accountPosts);
 
             return postdList.OrderBy(p => p.CreatedAt).Reverse().ToList();
@@ -139,10 +140,7 @@ namespace Api.Repos
             {
                  Context.RemoveRange(Context.Photos.Where(ph => photos.Contains(ph.Id)));
             }
-           
-
         }
-
-
+        
     }
 }
