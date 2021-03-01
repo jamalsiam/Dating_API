@@ -13,7 +13,7 @@ namespace Api.Context
 
         public DbSet<Post> Posts { get; set; }
         public DbSet<Photo> Photos { get; set; }
-        // public DbSet<PostComment> PostComments { get; set; }
+        public DbSet<PostComment> PostComments { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

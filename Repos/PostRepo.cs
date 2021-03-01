@@ -16,9 +16,11 @@ namespace Api.Repos
 
         private readonly DBContext Context;
         private readonly IMapper Mapper;
+        private readonly IPostCommentRepo CommentRepo;
 
-        public PostRepo(DBContext context, IMapper mapper)
+        public PostRepo(DBContext context, IMapper mapper, IPostCommentRepo commentRepo)
         {
+            this.CommentRepo = commentRepo;
             this.Mapper = mapper;
             this.Context = context;
 
@@ -39,24 +41,25 @@ namespace Api.Repos
             var post = Context.Posts.Where(p => p.Id == postId);
             var phs = await Context.Photos.Where(ph => ph.PostId == postId).ToListAsync();
 
-          var result =  await post
-            .Select(p => new PostReadDto
-            {
-                Id = p.Id,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt,
-                Text = p.Text,
-                UserId = p.AppUser.Id,
-                Feeling = p.Feeling,
-                Fullname = $"{p.AppUser.FirstName } {p.AppUser.LastName}",
-                UserPhotoUrl = p.AppUser.Photos.FirstOrDefault(p => p.IsMain).Url,
-                Photos = Mapper.Map<ICollection<PhotoDto>>(phs),
-                Shared = false,
-                LikedByAccount = p.PostLikes.Any(l => l.PostId == p.Id && l.AppUserId==accountId), 
-                LikesCount = p.PostLikes.Count(),
-                CommentsCount = 0,
-            })
-            .FirstOrDefaultAsync();
+            var result = await post
+              .Select( p  =>  new PostReadDto
+              {
+                  Id = p.Id,
+                  CreatedAt = p.CreatedAt,
+                  UpdatedAt = p.UpdatedAt,
+                  Text = p.Text,
+                  UserId = p.AppUser.Id,
+                  Feeling = p.Feeling,
+                  Fullname = $"{p.AppUser.FirstName } {p.AppUser.LastName}",
+                  UserPhotoUrl = p.AppUser.Photos.FirstOrDefault(p => p.IsMain).Url,
+                  Photos = Mapper.Map<ICollection<PhotoDto>>(phs),
+                  Shared = false,
+                  LikedByAccount = p.PostLikes.Any(l => l.PostId == p.Id && l.AppUserId == accountId),
+                  LikesCount = p.PostLikes.Count(),
+                  CommentsCount = p.PostComments.Count(),
+                  LastComments = CommentRepo.GetLastComments(p.Id,accountId)
+              })
+              .FirstOrDefaultAsync();
 
             return result;
         }
@@ -78,9 +81,10 @@ namespace Api.Repos
                 UserPhotoUrl = p.AppUser.Photos.FirstOrDefault(ph => ph.IsMain).Url,
                 Photos = Mapper.Map<ICollection<PhotoDto>>(p.Photos.Where(ph => ph.PostId == p.Id).ToList()),
                 Shared = false,
-                LikedByAccount = p.PostLikes.Any(l => l.PostId == p.Id && l.AppUserId==accountId), 
+                LikedByAccount = p.PostLikes.Any(l => l.PostId == p.Id && l.AppUserId == accountId),
                 LikesCount = p.PostLikes.Count(),
-                CommentsCount = 0,
+                CommentsCount = p.PostComments.Count(),
+                LastComments = CommentRepo.GetLastComments(p.Id,accountId)
             });
             return await postsList.OrderByDescending(p => p.Id).ToListAsync();
 
@@ -108,13 +112,14 @@ namespace Api.Repos
                                       Photos = Mapper.Map<ICollection<PhotoDto>>(createBy.Photos.Where(ph => ph.PostId == post.Id).ToList()),
                                       Feeling = post.Feeling,
                                       Shared = false,
-                                      LikedByAccount = post.PostLikes.Any(l => l.PostId == post.Id && l.AppUserId==accountId), 
-                                       LikesCount = post.PostLikes.Count(),
-                                      CommentsCount = 0,
+                                      LikedByAccount = post.PostLikes.Any(l => l.PostId == post.Id && l.AppUserId == accountId),
+                                      LikesCount = post.PostLikes.Count(),
+                                      CommentsCount = post.PostComments.Count(),
+                                      LastComments = CommentRepo.GetLastComments(post.Id,accountId)
                                   };
 
             postdList.AddRange(followingsPosts);
-            var accountPosts = await GetPosts(userId,accountId);
+            var accountPosts = await GetPosts(userId, accountId);
             postdList.AddRange(accountPosts);
 
             return postdList.OrderBy(p => p.CreatedAt).Reverse().ToList();
@@ -135,12 +140,12 @@ namespace Api.Repos
             currentPost.UpdatedAt = DateTime.Now;
             currentPost.Feeling = mappedPost.Feeling;
 
-            var photos =  mappedPost.Photos.Select(ph => ph.Id);
+            var photos = mappedPost.Photos.Select(ph => ph.Id);
             if (photos.Any())
             {
-                 Context.RemoveRange(Context.Photos.Where(ph => photos.Contains(ph.Id)));
+                Context.RemoveRange(Context.Photos.Where(ph => photos.Contains(ph.Id)));
             }
         }
-        
+
     }
 }

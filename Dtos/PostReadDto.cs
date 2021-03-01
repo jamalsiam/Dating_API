@@ -18,8 +18,9 @@ namespace Api.Dtos
         public int CommentsCount { get; set; }
         public string Fullname { get; set; }
         public string UserPhotoUrl { get; set; }
-        
+        public IEnumerable<CommentReadDto> LastComments { get; set; }
 
-        
+
+
     }
 }

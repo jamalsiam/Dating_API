@@ -16,6 +16,10 @@ namespace Api.Entities
         public Post Post { get; set; } 
         public int? PostId { get; set; }
 
+        [ForeignKey(nameof(CommentId))]
+        public PostComment Comment { get; set; } 
+        public int? CommentId { get; set; }
+
 
 
     }

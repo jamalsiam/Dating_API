@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20210222202019_init3")]
-    partial class init3
+    [Migration("20210228103455_PostComment")]
+    partial class PostComment
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -78,6 +78,9 @@ namespace Api.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CommentId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsMain")
                         .HasColumnType("tinyint(1)");
 
@@ -93,6 +96,9 @@ namespace Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
+
+                    b.HasIndex("CommentId")
+                        .IsUnique();
 
                     b.HasIndex("PostId");
 
@@ -125,6 +131,39 @@ namespace Api.Migrations
                     b.HasIndex("AppUserId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Api.Entities.PostComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("PhotoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostComments");
                 });
 
             modelBuilder.Entity("Api.Entities.PostLike", b =>
@@ -174,6 +213,10 @@ namespace Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Api.Entities.PostComment", "Comment")
+                        .WithOne("Photo")
+                        .HasForeignKey("Api.Entities.Photo", "CommentId");
+
                     b.HasOne("Api.Entities.Post", "Post")
                         .WithMany("Photos")
                         .HasForeignKey("PostId");
@@ -188,7 +231,7 @@ namespace Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Api.Entities.PostLike", b =>
+            modelBuilder.Entity("Api.Entities.PostComment", b =>
                 {
                     b.HasOne("Api.Entities.AppUser", "AppUser")
                         .WithMany()
@@ -198,6 +241,21 @@ namespace Api.Migrations
 
                     b.HasOne("Api.Entities.Post", "Post")
                         .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Api.Entities.PostLike", b =>
+                {
+                    b.HasOne("Api.Entities.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Entities.Post", "Post")
+                        .WithMany("PostLikes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
