@@ -102,19 +102,19 @@ namespace Api.Controllers
         {
             var user = await _userRepo.GetUserByUsername(User.GetUsername());
             var post = await _postRepo.GetPost(postId, user.Id);
-            var x = new List<Photo>(Mapper.Map<IEnumerable<Photo>>(post.Photos));
-            var y =  x.Select(e => new Photo{
-                Url= e.Url,
+            // var x = new List<Photo>(Mapper.Map<IEnumerable<Photo>>(post.Photos));
+            // var y =  x.Select(e => new Photo{
+            //     Url= e.Url,
 
-            }).ToList();
-            var mappedPhotos = Mapper.Map<ICollection<Photo>>(post.Photos);
+            // }).ToList();
+            // var mappedPhotos = Mapper.Map<ICollection<Photo>>(post.Photos);
 
             var newPost = new Post
             {
                 Text = post.Text,
                 Feeling = post.Feeling,
                 AppUserId = user.Id,
-                Photos = y
+                // Photos = y
                 
 
             };
