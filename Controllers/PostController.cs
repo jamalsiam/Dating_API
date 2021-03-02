@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Api.Dtos;
 using Api.Entities;
@@ -15,17 +16,17 @@ namespace Api.Controllers
     {
 
         private readonly IPostRepo _postRepo;
-        private readonly IMapper mapper;
+        private readonly IMapper Mapper;
         private readonly IUserRepo _userRepo;
 
         public PostController(
             IPostRepo postRepo,
-            IMapper mapper,
+            IMapper Mapper,
             IUserRepo userRepo
           )
         {
             this._postRepo = postRepo;
-            this.mapper = mapper;
+            this.Mapper = Mapper;
             this._userRepo = userRepo;
         }
 
@@ -34,7 +35,7 @@ namespace Api.Controllers
         {
             var user = await _userRepo.GetUserByUsername(User.GetUsername());
             post.UserId = user.Id;
-            var mappedPost = mapper.Map<Post>(post);
+            var mappedPost = Mapper.Map<Post>(post);
             _postRepo.AddPost(mappedPost);
             if (await _postRepo.SaveChanges())
             {
@@ -73,12 +74,12 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult> GetHomePosts([FromQuery] int id, [FromQuery] bool userPost)
         {
-             var user = await _userRepo.GetUserByUsername(User.GetUsername());
+            var user = await _userRepo.GetUserByUsername(User.GetUsername());
             if (userPost)
             {
                 return Ok(await _postRepo.GetPosts(id, user.Id));
             }
-           
+
             return Ok(await _postRepo.GetPosts(user.Id, user.Id));
         }
 
@@ -96,11 +97,34 @@ namespace Api.Controllers
 
         }
 
+        [HttpPost("share/{postId}")]
+        public async Task<ActionResult<PostReadDto>> share(int postId)
+        {
+            var user = await _userRepo.GetUserByUsername(User.GetUsername());
+            var post = await _postRepo.GetPost(postId, user.Id);
+            var x = new List<Photo>(Mapper.Map<IEnumerable<Photo>>(post.Photos));
+            var y =  x.Select(e => new Photo{
+                Url= e.Url,
 
+            }).ToList();
+            var mappedPhotos = Mapper.Map<ICollection<Photo>>(post.Photos);
 
+            var newPost = new Post
+            {
+                Text = post.Text,
+                Feeling = post.Feeling,
+                AppUserId = user.Id,
+                Photos = y
+                
 
+            };
+            _postRepo.AddPost(newPost);
+            if (await _postRepo.SaveChanges())
+            {
+                return Ok();
+
+            }
+            return BadRequest("Something went wrong");
+        }
     }
 }
-
-
-// IFormFile file
