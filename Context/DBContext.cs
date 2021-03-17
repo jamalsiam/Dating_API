@@ -10,11 +10,11 @@ namespace Api.Context
 
         public DbSet<AppUser> Users { get; set; }
         public DbSet<UserFollow> Follow { get; set; }
-
         public DbSet<Post> Posts { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<PostComment> PostComments { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,6 +34,16 @@ namespace Api.Context
             .WithMany(u => u.Followings)
             .HasForeignKey(u => u.FollowerId)
             .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Message>()
+            .HasOne(u => u.Recipient)
+            .WithMany(m => m.MessageReceived)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Message>()
+           .HasOne(u => u.Sender)
+           .WithMany(m => m.MessageSent)
+           .OnDelete(DeleteBehavior.Restrict);
+
 
 
         }

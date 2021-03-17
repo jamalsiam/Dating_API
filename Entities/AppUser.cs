@@ -23,6 +23,8 @@ namespace Api.Entities
         public ICollection<UserFollow> Followings { get; set; }
         public ICollection<UserFollow> Followers { get; set; }
         public ICollection<Post> Posts { get; set; }
+        public ICollection<Message> MessageSent { get; set; }
+        public ICollection<Message> MessageReceived { get; set; }
 
         
 
