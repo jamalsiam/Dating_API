@@ -47,6 +47,10 @@ namespace Api.Helpers
             CreateMap<PostComment, CommentReadDto>().ReverseMap()
             .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
 
+            CreateMap<Message, MessageAddDto>().ReverseMap();
+
+            CreateMap<Message, MessageReadDto>().ReverseMap();
+
 
         }
     }

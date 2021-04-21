@@ -22,6 +22,7 @@ namespace Api.Extensions
             services.AddScoped<IPostRepo, PostRepo>();
             services.AddScoped<IPostCommentRepo, PostCommentRepo>();
             services.AddScoped<IPostLikeRepo, PostLikeRepo>();
+            services.AddScoped<IMessageRepo, MessageRepo>();
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddScoped<ITokenService, TokenService>();
