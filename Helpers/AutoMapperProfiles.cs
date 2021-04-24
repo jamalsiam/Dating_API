@@ -51,6 +51,9 @@ namespace Api.Helpers
 
             CreateMap<Message, MessageReadDto>().ReverseMap();
 
+            CreateMap<Notification, NotificationAddDto>().ReverseMap();
+            CreateMap<Message, NotificationReadDto>().ReverseMap();
+
 
         }
     }

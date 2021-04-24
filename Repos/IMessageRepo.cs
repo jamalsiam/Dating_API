@@ -13,7 +13,7 @@ namespace Api.Repos
         Task<MessageReadDto> GetMessage(int id,int accountId);
         Task<PagedListX<MessageReadDto>> GetMessages(UserParams userParams, int accountId, int userId);
         Task<UserChatDto> GetUserInfo(int Id);
-        Task<IEnumerable<UserChatDto>> GetUsersList(int accountId);
+        Task<IEnumerable<UserList>> GetUsersList(int accountId);
         Task<bool> SaveChanges();
     }
 }

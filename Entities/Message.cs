@@ -15,7 +15,7 @@ namespace Api.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public bool SenderDeleted { get; set; }
         public bool RecipientDeleted { get; set; }
-        public bool Deleted { get; set; }
+        public bool Deleted { get; set; } // unsend
         public int Reaction { get; set; }
 
     }

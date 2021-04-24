@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Api.Context;
 using Api.Dtos;
 using Api.Entities;
+using Api.Enums;
 using Api.Helpers;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -15,21 +16,34 @@ namespace Api.Repos
     {
         private readonly DBContext Context;
         private readonly IMapper Mapper;
+        private readonly INotificationRepo Notification;
 
-        public FollowRepo(DBContext context, IMapper mapper)
+        public FollowRepo(DBContext context,
+        IMapper mapper,
+        INotificationRepo notification)
         {
             this.Mapper = mapper;
             this.Context = context;
+            Notification = notification;
 
         }
         public void Follow(FollowAddDto follow)
         {
             var mappedUserFollow = Mapper.Map<UserFollow>(follow);
             Context.Follow.Add(mappedUserFollow);
+            Notification.Add(mappedUserFollow.FollowerId,
+            mappedUserFollow.FollowingId,
+            mappedUserFollow.FollowingId,
+            (int)NotificationActionEnum.Follow);
         }
         public void Unfollowing(UserFollow follow)
         {
             Context.Follow.Remove(follow);
+            
+            Notification.Add(follow.FollowerId,
+            follow.FollowingId,
+            follow.FollowingId,
+            (int)NotificationActionEnum.Unfollow);
         }
 
         public async Task<PagedList<FollowReadDto>> GetFollowers(UserParams userParams, int followerId, int accountId)

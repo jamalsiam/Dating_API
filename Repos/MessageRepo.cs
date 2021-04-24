@@ -89,7 +89,7 @@ namespace Api.Repos
                      Deleted = m.Deleted,
                      Reaction = m.Reaction
 
-                 }).OrderByDescending(i=>i.Id);
+                 }).OrderByDescending(i => i.Id);
 
             return await PagedListX<MessageReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
         }
@@ -114,45 +114,47 @@ namespace Api.Repos
             .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<UserChatDto>> GetUsersList(int accountId)
+        public async Task<IEnumerable<UserList>> GetUsersList(int accountId)
         {
-            //.SenderId
-            var messages = Context.Messages
-                .Where(m => m.SenderId == accountId || m.RecipientId == accountId)
-                .OrderByDescending(m => m.CreatedAt)
-                .GroupBy(m => new {m.SenderId, m.RecipientId, m.Reaction})                
-                .Select(group => new UserChatDto(){
-                            UserId = group.Key.SenderId == accountId ? group.First().RecipientId : group.First().SenderId,
-                            AccountId = accountId,
-                            Fullname = group.First().SenderId == accountId ? $"{group.First().Recipient.UserName } {group.First().Recipient.LastName}" : $"{group.First().Sender.UserName } {group.First().Sender.LastName}",
-                            PhotoUrl = group.First().SenderId == accountId ? group.First().Recipient.Photos.FirstOrDefault(ph => ph.IsMain).Url
-                            : group.First().Sender.Photos.FirstOrDefault(ph => ph.IsMain).Url,
-                            TextMessage = group.First().Text,
-                            Seen = false,
-                            MessageCreateAt = group.First().UpdatedAt,
-                            Active = false,
-                          })
-                ;
-
-            // var messages = from m in Context.Messages
-            // where  m.SenderId == accountId || m.RecipientId == accountId
-            // group m by m.SenderId == accountId ? m.RecipientId : m.SenderId into g
-            // select g.OrderByDescending(m => m.CreatedAt)
-            //         .Select(m => new UserChatDto(){
-            //                 UserId = m.SenderId == accountId ? m.RecipientId : m.SenderId,
-            //                 AccountId = accountId,
-            //                 Fullname = m.SenderId == accountId ? $"{m.Recipient.UserName } {m.Recipient.LastName}" : $"{m.Sender.UserName } {m.Sender.LastName}",
-            //                 PhotoUrl = m.SenderId == accountId ? m.Recipient.Photos.FirstOrDefault(ph => ph.IsMain).Url
-            //                 : m.Sender.Photos.FirstOrDefault(ph => ph.IsMain).Url,
-            //                 TextMessage = m.Text,
-            //                 Seen = false,
-            //                 MessageCreateAt = m.UpdatedAt,
-            //                 Active = false,
-            //               }).First();
 
 
-            return  messages;
-            //return  null;
+            var userList = await Context.UserList.FromSqlRaw($@"
+            SELECT t.SenderId, t.RecipientId, r.MaxTime as createdAt,t.Text, t.id, 
+
+            CASE t.SenderId
+                    WHEN {accountId} THEN CONCAT(r.FirstName , ' ' , r.LastName) 
+                    
+                    ELSE CONCAT(u.FirstName , ' ' , u.LastName)
+                end Fullname ,
+                
+                CASE t.SenderId
+                    WHEN {accountId} THEN  r.LastActive 
+                    
+                    ELSE  u.LastActive
+                end lastActivation   ,
+    
+                CASE t.SenderId
+                    WHEN {accountId} THEN    (select p.Url from Dating.photos p where p.ismain = 1 and p.AppUserId = r.id)       
+                    ELSE (select p.Url from Dating.photos p where p.ismain = 1 and p.AppUserId = u.id)    
+                end PhotoUrl 
+                        
+            FROM (
+                SELECT SenderId, RecipientId, MAX(CreatedAt) as MaxTime
+                FROM Dating.Messages
+                GROUP BY SenderId, RecipientId
+            ) r
+            INNER JOIN Dating.Messages t
+            ON t.SenderId = r.SenderId AND t.RecipientId = r.RecipientId  AND t.CreatedAt = r.MaxTime
+            Inner join Dating.Users u 
+            on u.id = t.SenderId
+            Inner join Dating.Users r 
+            on r.id = t.RecipientId
+            where t.RecipientId = {accountId} or t.SenderId = {accountId}")
+            .ToListAsync();
+
+
+ 
+            return userList;
         }
 
         public async Task<bool> SaveChanges()

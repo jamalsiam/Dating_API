@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Api.Context;
 using Api.Dtos;
 using Api.Entities;
+using Api.Enums;
 using Api.Helpers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +15,30 @@ namespace Api.Repos
     {
         public readonly DBContext Context;
         private readonly IMapper Mapper;
-        public PostCommentRepo(DBContext context, IMapper mapper)
+
+        private readonly INotificationRepo Notification;
+        public PostCommentRepo(DBContext context, IMapper mapper, INotificationRepo notification)
         {
             this.Mapper = mapper;
             this.Context = context;
+
+            this.Notification = notification;
 
         }
 
         public void Comment(PostComment comment)
         {
             Context.PostComments.Add(comment);
+            var postAuthorId = Context.Posts.FirstOrDefault(p => p.Id == comment.PostId).AppUserId;
+            if (postAuthorId != comment.AppUserId)
+            {
+                Notification.Add(postAuthorId,
+                     comment.AppUserId,
+                     comment.PostId,
+                     (int)NotificationActionEnum.Comment);
+            }
+
+
         }
 
         public void DeleteComment(int commentId, int accountId)

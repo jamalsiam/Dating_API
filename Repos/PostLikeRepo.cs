@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Api.Context;
 using Api.Dtos;
 using Api.Entities;
+using Api.Enums;
 using Api.Helpers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,16 @@ namespace Api.Repos
 
         public readonly DBContext Context;
         private readonly IMapper Mapper;
-        public PostLikeRepo(DBContext context, IMapper mapper)
+        private readonly INotificationRepo Notification;
+        public PostLikeRepo(DBContext context, IMapper mapper, INotificationRepo notification)
         {
             this.Mapper = mapper;
             this.Context = context;
-
+            this.Notification = notification;
         }
 
 
-        public async Task<PagedList<PostLikeReadDto>> GetLikes(int postId, UserParams userParams,int accountId)
+        public async Task<PagedList<PostLikeReadDto>> GetLikes(int postId, UserParams userParams, int accountId)
         {
             var likes = Context
             .PostLikes
@@ -38,7 +40,7 @@ namespace Api.Repos
                 Fullname = $"{l.AppUser.FirstName} {l.AppUser.LastName}",
                 UserPhotoUrl = l.AppUser.Photos.FirstOrDefault(p => p.IsMain).Url,
                 CreatedAt = l.CreatedAt,
-                FollowingByAccount = Context.Follow.Any(f=> f.FollowerId == l.AppUserId && f.FollowingId == accountId)
+                FollowingByAccount = Context.Follow.Any(f => f.FollowerId == l.AppUserId && f.FollowingId == accountId)
             });
             return await PagedList<PostLikeReadDto>
                        .CreateAsync(
@@ -52,7 +54,7 @@ namespace Api.Repos
         {
             return await Context
             .PostLikes
-            .FirstOrDefaultAsync(l => l.AppUserId ==userId && l.PostId ==postId  );
+            .FirstOrDefaultAsync(l => l.AppUserId == userId && l.PostId == postId);
         }
 
         public void Like(int userId, int postId)
@@ -63,6 +65,12 @@ namespace Api.Repos
                 PostId = postId,
                 CreatedAt = DateTime.Now
             });
+
+            Notification.Add(
+                Context.Posts.FirstOrDefault(p => p.Id == postId).AppUserId,
+                userId,
+                postId,
+               (int)NotificationActionEnum.like);
         }
 
         public void UnLike(PostLike postLike)
