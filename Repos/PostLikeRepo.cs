@@ -65,12 +65,16 @@ namespace Api.Repos
                 PostId = postId,
                 CreatedAt = DateTime.Now
             });
-
-            Notification.Add(
-                Context.Posts.FirstOrDefault(p => p.Id == postId).AppUserId,
+            var authorId =Context.Posts.FirstOrDefault(p => p.Id == postId).AppUserId;
+            if (authorId !=userId)
+            {
+                Notification.Add(
+                authorId,
                 userId,
                 postId,
                (int)NotificationActionEnum.like);
+            }
+           
         }
 
         public void UnLike(PostLike postLike)

@@ -62,7 +62,7 @@ namespace Api.Repos
 
         }
 
-        public async Task<PagedListX<MessageReadDto>> GetMessages(UserParams userParams, int accountId, int userId)
+        public async Task<PagedList<MessageReadDto>> GetMessages(UserParams userParams, int accountId, int userId)
         {
 
             var query = Context.Messages
@@ -91,7 +91,7 @@ namespace Api.Repos
 
                  }).OrderByDescending(i => i.Id);
 
-            return await PagedListX<MessageReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<MessageReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
         }
 
         public async Task<UserChatDto> GetUserInfo(int id)

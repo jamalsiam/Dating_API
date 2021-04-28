@@ -62,15 +62,15 @@ namespace Api.Controllers
             }
             return BadRequest();
         }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostLikeReadDto>>> GetComments([FromQuery] int postId, [FromQuery] UserParams userParams)
+        [HttpGet("pagination")]
+        public async Task<ActionResult<PagedList<PostLikeReadDto>>> GetComments([FromQuery] int id, [FromQuery] UserParams userParams)
         {
             var user = await UserRepo.GetUserByUsername(User.GetUsername());
             if (user == null) return BadRequest();
             var comments= await PostCommentRepo
-            .GetComments(postId, userParams, user.Id);
-             Response.AddPaginationHeader(comments.CurrentPage, comments.PageSize,
-              comments.TotalCount, comments.TotalPages);
+            .GetComments(id, userParams, user.Id);
+            
+            
             return Ok(comments);
         }
 

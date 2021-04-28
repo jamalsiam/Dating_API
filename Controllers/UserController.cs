@@ -31,22 +31,7 @@ namespace Api.Controllers
             _mapper = mapper;
             _photoService = PhotoService;
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDto>>> AllMembers([FromQuery] UserParams userParams)
-        {
-             var user = await _userepo.GetUserByUsername(User.GetUsername());
-            userParams.CurrentUsername = user.UserName;
-
-
-            var users = await _userepo.AllMembers(userParams);
-
-            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, 
-                users.TotalCount, users.TotalPages);
-            return Ok(users);
-        }
-
-
+ 
         [HttpGet("filter/{text}")]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByText(string text)
         {

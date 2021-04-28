@@ -26,11 +26,11 @@ namespace Api.Controllers
         {
             this.PostLikeRepo = postLikeRepo;
             this.Mapper = mapper;
-            this.UserRepo = userRepo; 
+            this.UserRepo = userRepo;
             this.PostRepo = postRepo;
         }
         [HttpPost]
-        public async Task<ActionResult> Like(LikeAddDeleteDto likeAddDelete )
+        public async Task<ActionResult> Like(LikeAddDeleteDto likeAddDelete)
         {
             var user = await UserRepo.GetUserByUsername(User.GetUsername());
             if (user == null) return BadRequest();
@@ -51,13 +51,12 @@ namespace Api.Controllers
             return BadRequest("Something Went Wrong");
         }
 
-        public async Task<ActionResult<IEnumerable<PostLikeReadDto>>> GetLikes([FromQuery] int postId, [FromQuery] UserParams userParams)
+        [HttpGet("pagination")]
+        public async Task<ActionResult<PagedList<PostLikeReadDto>>> GetLikes([FromQuery] int id, [FromQuery] UserParams userParams)
         {
             var user = await UserRepo.GetUserByUsername(User.GetUsername());
-            var post = await PostRepo.GetPost(postId, user.Id);
+            var post = await PostRepo.GetPost(id, user.Id);
             var likes = await PostLikeRepo.GetLikes(post.Id, userParams, user.Id);
-            Response.AddPaginationHeader(likes.CurrentPage, likes.PageSize,
-              likes.TotalCount, likes.TotalPages);
             return Ok(likes);
         }
 

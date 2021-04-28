@@ -78,22 +78,20 @@ namespace Api.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FollowReadDto>>> GetFollows([FromQuery] UserParams userParams, [FromQuery] int userId, [FromQuery] int followBy)
+      [HttpGet("pagination")]
+        public async Task<ActionResult<PagedList<FollowReadDto>>> GetFollows([FromQuery] UserParams userParams, [FromQuery] int id, [FromQuery] int followBy)
         {
             var accountId = (await _useRepo.GetUserByUsername(User.GetUsername())).Id;
 
             if ((int)FollowEnum.ByUser == followBy)
             {
-                var followers = await _followRepo.GetFollowers(userParams, userId, accountId);
-                Response.AddPaginationHeader(followers.CurrentPage, followers.PageSize,
-                followers.TotalCount, followers.TotalPages);
+                var followers = await _followRepo.GetFollowers(userParams, id, accountId);
+               
                 return Ok(followers);
             }
-
-            var followings = await _followRepo.GetFollowings(userParams, userId, accountId);
-            Response.AddPaginationHeader(followings.CurrentPage, followings.PageSize,
-               followings.TotalCount, followings.TotalPages);
+            
+            var followings = await _followRepo.GetFollowings(userParams, id, accountId);
+   
             return Ok(followings);
 
 

@@ -40,7 +40,7 @@ namespace Api.Repos
 
         }
 
-        public async Task<PagedListX<NotificationReadDto>> GetAccountNotification(UserParams userParams, int accountId)
+        public async Task<PagedList<NotificationReadDto>> GetAccountNotification(UserParams userParams, int accountId)
         {
             var query = Context.Notifications
                  .OrderBy(m => m.CreatedAt)
@@ -60,10 +60,10 @@ namespace Api.Repos
 
                  }).OrderByDescending(i => i.Id);
 
-            return await PagedListX<NotificationReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<NotificationReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedListX<NotificationReadDto>> GetUserNotification(UserParams userParams, int accountId, int userId)
+        public async Task<PagedList<NotificationReadDto>> GetUserNotification(UserParams userParams, int accountId, int userId)
         {
             var query = Context.Notifications
                  .OrderBy(m => m.CreatedAt)
@@ -82,7 +82,7 @@ namespace Api.Repos
                      Description = ""
                  }).OrderByDescending(i => i.Id);
 
-            return await PagedListX<NotificationReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<NotificationReadDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
         }
         public async Task<bool> SaveChanges()
         {

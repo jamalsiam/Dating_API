@@ -8,8 +8,8 @@ namespace Api.Repos
     {
         void Add(int userId, int subjectId, int eventId, int actionType);
         void Delete(int id, int accountId);
-        Task<PagedListX<NotificationReadDto>> GetAccountNotification(UserParams userParams, int accountId);
-        Task<PagedListX<NotificationReadDto>> GetUserNotification(UserParams userParams, int accountId, int userId);
+        Task<PagedList<NotificationReadDto>> GetAccountNotification(UserParams userParams, int accountId);
+        Task<PagedList<NotificationReadDto>> GetUserNotification(UserParams userParams, int accountId, int userId);
         Task<bool> SaveChanges();
     }
 }

@@ -80,7 +80,7 @@ namespace Api.Controllers
                 return Ok(await _postRepo.GetPosts(id, user.Id));
             }
 
-            return Ok(await _postRepo.GetPosts(user.Id, user.Id));
+            return Ok(await _postRepo.GetPosts(user.Id, user.Id, true));
         }
 
         [HttpDelete("{id}")]

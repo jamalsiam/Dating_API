@@ -62,7 +62,7 @@ namespace Api.Controllers
 
         }
         [HttpGet("pagination")]
-        public async Task<PagedListX<MessageReadDto>> getMessages([FromQuery] UserParams userParams, [FromQuery] int id)
+        public async Task<PagedList<MessageReadDto>> getMessages([FromQuery] UserParams userParams, [FromQuery] int id)
         {
             var user = await UserRepo.GetUserByUsername(User.GetUsername());
             if (user == null) return null;
