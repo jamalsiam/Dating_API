@@ -16,6 +16,7 @@ namespace Api.Dtos
         public string LastName { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastActive { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public bool Gender { get; set; }
         public string Introduction { get; set; }
         public string Intersts { get; set; }

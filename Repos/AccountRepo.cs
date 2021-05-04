@@ -47,10 +47,19 @@ namespace Api.Repos
             return await Context.SaveChangesAsync() > 0;
         }
 
+        public AppUser ChangePassword(AppUser user, string password)
+        {
+            using HMACSHA512 hmac = new HMACSHA512();
+            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            user.PasswordSalt = hmac.Key;
+            return user;
+        }
         public async Task<bool> UserExists(string username)
         {
             return await Context.Users.AnyAsync(u => u.UserName.ToLower() == username.ToLower());
         }
+
+
 
     }
 }

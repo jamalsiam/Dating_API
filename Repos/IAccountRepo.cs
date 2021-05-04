@@ -11,6 +11,7 @@ namespace Api.Repos
 
         Task<bool> UserExists(string username);
         Task<bool> SaveChanges();
-
+        AppUser ChangePassword(AppUser user, string password);
+ 
     }
 }

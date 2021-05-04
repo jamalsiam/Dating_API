@@ -21,17 +21,23 @@ namespace Api.Controllers
     {
         private readonly IPhotoService _photoService;
         private readonly IUserRepo _userepo;
+        private readonly IAccountRepo _accountRepo;
         private readonly IMapper _mapper;
+        private readonly ITokenService _tokenService;
 
         public UserController(IUserRepo userepo,
                               IMapper mapper,
+                              IAccountRepo accountRepo,
+                              ITokenService tokenService,
                               IPhotoService PhotoService)
         {
             _userepo = userepo;
             _mapper = mapper;
             _photoService = PhotoService;
+            _accountRepo = accountRepo;
+            _tokenService = tokenService;
         }
- 
+
         [HttpGet("filter/{text}")]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByText(string text)
         {
@@ -58,14 +64,14 @@ namespace Api.Controllers
 
             _userepo.Update(user);
 
-            if (await _userepo.SaveChanges()) return NoContent();
+            if (await _userepo.SaveChanges()) return Ok(await _userepo.GetMember(user.Id));
 
             return BadRequest("Failed to update user");
         }
 
 
         [HttpPost("add-photo")]
-        public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file,[FromForm] bool skipMian,[FromForm] int postId)
+        public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file, [FromForm] bool skipMian, [FromForm] int postId)
         {
             try
             {
@@ -80,7 +86,7 @@ namespace Api.Controllers
                 {
                     Url = result.SecureUrl.AbsoluteUri,
                     PublicId = result.PublicId,
-                   
+
                 };
                 if (postId != 0)
                 {
@@ -91,7 +97,7 @@ namespace Api.Controllers
                 if (skipMian)
                 {
                     photo.IsMain = false;
-                    
+
                 }
                 else
                 {
@@ -125,7 +131,7 @@ namespace Api.Controllers
 
             var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
 
-            if (photo.IsMain) return BadRequest("This is already your main photo");
+            if (photo.IsMain) return BadRequest("This photo already your main photo");
 
             var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
             if (currentMain != null) currentMain.IsMain = false;
@@ -159,5 +165,44 @@ namespace Api.Controllers
 
             return BadRequest("Failed to delete the photo");
         }
+
+
+
+
+        [HttpPut("updatePassword")]
+        public async Task<ActionResult> UpdatePassword(UpdatePasswordDto password)
+        {
+            var account = await _userepo.GetUserByUsername(User.GetUsername());
+
+            SigninDto signinDto = new SigninDto
+            {
+                Username = account.UserName,
+                Password = password.OldPassword,
+            };
+            AppUser user = await _accountRepo.Signin(signinDto);
+            if (user.Id != 0)
+            {
+                _accountRepo.ChangePassword(user, password.NewPassword);
+
+                if (await _accountRepo.SaveChanges())
+                {
+                    return Ok(new UserDto()
+                    {
+                        Id = user.Id,
+                        Username = user.UserName,
+                        Token = _tokenService.CreateToken(user)
+                    });
+                }
+                return BadRequest("Something Went Error");
+            }
+            else
+            {
+                return BadRequest("Invalid Old Password");
+
+            }
+
+
+        }
+
     }
 }
