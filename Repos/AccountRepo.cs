@@ -23,7 +23,15 @@ namespace Api.Repos
             {
                 UserName = signupObj.Username,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(signupObj.Password)),
-                PasswordSalt = hmac.Key
+                PasswordSalt = hmac.Key,
+                DateOfBirth= signupObj.Birthdate,
+                City = signupObj.City,
+                Country= signupObj.Country,
+                FirstName = signupObj.FirstName,
+                LastName = signupObj.LastName,
+                Gender = signupObj.Gender,
+
+
             };
             Context.Users.Add(user);
 
