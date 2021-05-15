@@ -79,7 +79,7 @@ namespace Api.Controllers
             return Ok(await MessageRepo.GetUserInfo(id));
 
         }
-
+        
         [HttpDelete("unsend/{Id}")]
         public async Task<ActionResult> Unsend(int id)
         {
@@ -95,6 +95,17 @@ namespace Api.Controllers
                 return Ok();
             }
             return BadRequest("User error");
+
+        }
+        [HttpPut("readMessage/{Id}")]
+        public async Task<ActionResult> ReadMessage(int id)
+        {
+            var user = await UserRepo.GetUserByUsername(User.GetUsername());
+            if (user == null) return BadRequest("User error");
+
+            MessageRepo.ReadMessages(user.Id, id);
+            await MessageRepo.SaveChanges();
+            return Ok();
 
         }
 

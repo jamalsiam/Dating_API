@@ -157,6 +157,16 @@ namespace Api.Repos
             return userList;
         }
 
+        public void ReadMessages(int accountId, int userId)
+        {
+            Context.Messages.Where(m =>
+            m.SenderId == userId && m.RecipientId == accountId
+            );
+            List<Message> MessageList = Context.Messages.Where(m =>
+              m.SenderId == userId && m.RecipientId == accountId).ToList();
+            MessageList.ForEach(m => { m.DateRead = DateTime.Now; });
+        }
+
         public async Task<bool> SaveChanges()
         {
             return await Context.SaveChangesAsync() > 0;
