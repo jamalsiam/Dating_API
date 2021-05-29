@@ -1,4 +1,5 @@
 
+using System;
 using Api.Context;
 using Api.Helpers;
 using Api.Interface;
@@ -27,7 +28,8 @@ namespace Api.Extensions
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddScoped<ITokenService, TokenService>();
-            services.AddDbContext<DBContext>(opt => opt.UseMySQL(config.GetConnectionString("dbConnection")));
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
+            services.AddDbContext<DBContext>(opt => opt.UseMySql(config.GetConnectionString("dbConnection"),serverVersion));
 
             services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<IAccountRepo, AccountRepo>();

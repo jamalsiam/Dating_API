@@ -174,32 +174,22 @@ namespace Api.Controllers
         {
             var account = await _userepo.GetUserByUsername(User.GetUsername());
 
-            SigninDto signinDto = new SigninDto
-            {
-                Username = account.UserName,
-                Password = password.OldPassword,
-            };
-            AppUser user = await _accountRepo.Signin(signinDto);
-            if (user.Id != 0)
-            {
-                _accountRepo.ChangePassword(user, password.NewPassword);
+            if (account ==null) return BadRequest("invalid user");
 
-                if (await _accountRepo.SaveChanges())
+                var result = await _accountRepo.ChangePassword(account, password.OldPassword, password.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok(new UserDto()
                 {
-                    return Ok(new UserDto()
-                    {
-                        Id = user.Id,
-                        Username = user.UserName,
-                        Token = _tokenService.CreateToken(user)
-                    });
-                }
-                return BadRequest("Something Went Error");
+                    Id = account.Id,
+                    Username = account.UserName,
+                    Token = await _tokenService.CreateToken(account)
+                });
             }
-            else
-            {
-                return BadRequest("Invalid Old Password");
+            return BadRequest("Something Went Error");
 
-            }
+
 
 
         }

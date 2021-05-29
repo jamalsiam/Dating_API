@@ -1,17 +1,18 @@
 using System.Threading.Tasks;
 using Api.Dtos;
 using Api.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.Repos
 {
     public interface IAccountRepo
     {
-        AppUser Signup(SignupDto signupObj);
+        Task<AppUser> Signup(SignupDto signupObj);
         Task<AppUser> Signin(SigninDto signinObj);
 
         Task<bool> UserExists(string username);
-        Task<bool> SaveChanges();
-        AppUser ChangePassword(AppUser user, string password);
+       // Task<bool> SaveChanges();
+        Task<IdentityResult> ChangePassword(AppUser user, string oldPassword, string newPassword);
  
     }
 }

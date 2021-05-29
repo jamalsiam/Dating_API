@@ -22,17 +22,20 @@ namespace Api.Controllers
         public async Task<ActionResult<UserDto>> Signup(SignupDto signupObj)
         {
             if (await AccountRepo.UserExists(signupObj.Username)) return BadRequest("User Exists");
-            AppUser user = AccountRepo.Signup(signupObj);
-            if (!await AccountRepo.SaveChanges())
+            AppUser user = await AccountRepo.Signup(signupObj);
+
+            if (user != null)
             {
-                return Unauthorized();
+                return Ok(new UserDto
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    Token = await TokenService.CreateToken(user)
+                });
             }
-            return Ok(new UserDto
-            {
-                Id = user.Id,
-                Username = user.UserName,
-                Token = TokenService.CreateToken(user)
-            });
+            return BadRequest("invalid Sginup");
+
+
         }
 
         [HttpPost("Signin")]
@@ -46,7 +49,7 @@ namespace Api.Controllers
                 {
                     Id = user.Id,
                     Username = user.UserName,
-                    Token = TokenService.CreateToken(user)
+                    Token = await TokenService.CreateToken(user)
                 });
             }
             else
