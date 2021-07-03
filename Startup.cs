@@ -1,6 +1,7 @@
 
 using Api.Extensions;
 using Api.Middlewares;
+using API.SignalR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,8 @@ namespace Api
                 .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
+            services.AddCors( );
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,15 +49,18 @@ namespace Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors(policy => policy.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader());
+   app.UseCors(x => x.AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:4200"));
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<PresenceHub>("hubs/presence");
+                endpoints.MapHub<PresenceHub>("hubs/message");
             });
         }
     }

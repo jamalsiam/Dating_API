@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+ 
     public class AccountController : BaseApiController
     {
+        
         public IAccountRepo AccountRepo { get; }
         public ITokenService TokenService { get; }
         public AccountController(IAccountRepo accountRepo, ITokenService tokenService)
@@ -39,7 +41,7 @@ namespace Api.Controllers
         }
 
         [HttpPost("Signin")]
-        public async Task<ActionResult<UserDto>> Signin(SigninDto signupObj)
+        public async Task<ActionResult<UserDto>> Signin( SigninDto signupObj)
         {
             if (!await AccountRepo.UserExists(signupObj.Username)) return BadRequest("Invalid Username");
             AppUser user = await AccountRepo.Signin(signupObj);
@@ -58,6 +60,12 @@ namespace Api.Controllers
 
             }
 
+        }
+        [HttpGet]
+        public ActionResult Get()
+        {
+            
+            return  Ok("ssfsfs");
         }
 
     }

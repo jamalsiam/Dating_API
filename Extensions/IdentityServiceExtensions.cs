@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Tasks;
 using Api.Context;
 using Api.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,11 +12,12 @@ namespace Api.Extensions
 {
     public static class IdentityServiceExtensions
     {
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services, 
+        public static IServiceCollection AddIdentityServices(this IServiceCollection services,
             IConfiguration config)
         {
 
-            services.AddIdentityCore<AppUser>(opt =>{
+            services.AddIdentityCore<AppUser>(opt =>
+            {
                 opt.Password.RequireNonAlphanumeric = false;
             })
             .AddRoles<AppRole>()
@@ -24,7 +26,7 @@ namespace Api.Extensions
             .AddRoleValidator<RoleValidator<AppRole>>()
             .AddEntityFrameworkStores<DBContext>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => 
+                .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -33,8 +35,25 @@ namespace Api.Extensions
                         ValidateIssuer = false,
                         ValidateAudience = false,
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["accessToken"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                             path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+
+                        }
+                    };
                 });
-           //    services.AddAuthorization();
+
+            //    services.AddAuthorization();
             return services;
         }
     }
