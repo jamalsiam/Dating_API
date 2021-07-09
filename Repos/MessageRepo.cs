@@ -145,9 +145,9 @@ namespace Api.Repos
             ) r
             INNER JOIN Dating.Messages t
             ON t.SenderId = r.SenderId AND t.RecipientId = r.RecipientId  AND t.CreatedAt = r.MaxTime
-            Inner join Dating.Users u 
+            Inner join Dating.AspNetUsers u 
             on u.id = t.SenderId
-            Inner join Dating.Users r 
+            Inner join Dating.AspNetUsers r 
             on r.id = t.RecipientId
             where t.RecipientId = {accountId} or t.SenderId = {accountId}")
             .ToListAsync();

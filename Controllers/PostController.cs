@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Threading.Tasks;
 using Api.Dtos;
 using Api.Entities;
@@ -86,6 +87,7 @@ namespace Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePosts(int id)
         {
+           
             var user = await _userRepo.GetUserByUsername(User.GetUsername());
             _postRepo.DeletePost(user.Id, id);
 

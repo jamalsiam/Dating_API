@@ -30,9 +30,9 @@ namespace Api.Repos
             Context.Posts.Add(post);
         }
 
-        public async void DeletePost(int userId, int postId)
+        public  void DeletePost(int userId, int postId)
         {
-            var post = await Context.Posts.FirstOrDefaultAsync(p => p.Id == postId && p.AppUserId == userId);
+            var post =  Context.Posts.FirstOrDefault(p => p.Id == postId && p.AppUserId == userId);
             Context.Posts.Remove(post);
         }
 
