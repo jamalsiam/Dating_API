@@ -50,7 +50,7 @@ namespace Api.Repos
                      Id = n.Id,
                      ActionType = n.ActionType,
                      CreatedAt = n.CreatedAt,
-                     AppUserId = n.AppUserId,
+                     AppUserId = n.Subject.Id,
                      SubjectId = n.SubjectId,
                      SubjectFullname = $"{n.Subject.FirstName} {n.Subject.LastName}",
                      SubjectPhotoUrl = n.Subject.Photos.FirstOrDefault(ph => ph.IsMain).Url,

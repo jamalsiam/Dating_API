@@ -1,7 +1,7 @@
 
 using Api.Extensions;
 using Api.Middlewares;
-using API.SignalR;
+using Api.SignalR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,40 +27,48 @@ namespace Api
 
             services.AddApplicationServices(_config);
             services.AddControllers();
+            services.AddCors();
             services.AddIdentityServices(_config);
 
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
-            services.AddCors( );
-            services.AddSignalR();
+
+            services.AddSignalR(e =>
+            {
+                e.MaximumReceiveMessageSize = 102400000;
+                e.EnableDetailedErrors = true;
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-   app.UseCors(x => x.AllowAnyHeader()
+
+            app.UseCors(x => x.AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()
                 .WithOrigins("http://localhost:4200"));
+
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<PresenceHub>("hubs/presence");
-                endpoints.MapHub<PresenceHub>("hubs/message");
+                // endpoints.MapHub<MessageHub>("hubs/message");
+                // endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }
