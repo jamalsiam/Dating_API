@@ -26,7 +26,7 @@ namespace Api.Extensions
             services.AddScoped<IPostCommentRepo, PostCommentRepo>();
             services.AddScoped<IPostLikeRepo, PostLikeRepo>();
             services.AddScoped<IMessageRepo, MessageRepo>();
-
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddScoped<ITokenService, TokenService>();
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));

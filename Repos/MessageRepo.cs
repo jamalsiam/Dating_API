@@ -33,6 +33,27 @@ namespace Api.Repos
             Context.Messages.Remove(message);
         }
 
+        public async Task<Connection> GetConnection(string connectionId)
+        {
+            return await Context.Connections.FindAsync(connectionId);
+        }
+
+        public async Task<Group> GetGroupForConnection(string connectionId)
+        {
+            return await Context.Groups
+                .Include(c => c.Connections)
+                .Where(c => c.Connections.Any(x => x.ConnectionId == connectionId))
+                .FirstOrDefaultAsync();
+        }
+        public void RemoveConnection(Connection connection)
+        {
+            Context.Connections.Remove(connection);
+        }
+          public void AddGroup(Group group)
+        {
+            Context.Groups.Add(group);
+        }
+
         public async Task<MessageReadDto> GetMessage(int id, int accountId)
         {
             var query = Context.Messages
@@ -60,6 +81,13 @@ namespace Api.Repos
                 });
             return await query.FirstOrDefaultAsync(m => m.Id == id);
 
+        }
+
+        public async Task<Group> GetMessageGroup(string groupName)
+        {
+            return await Context.Groups
+                 .Include(x => x.Connections)
+                 .FirstOrDefaultAsync(x => x.Name == groupName);
         }
 
         public async Task<PagedList<MessageReadDto>> GetMessages(UserParams userParams, int accountId, int userId)
@@ -153,7 +181,7 @@ namespace Api.Repos
             .ToListAsync();
 
 
- 
+
             return userList;
         }
 

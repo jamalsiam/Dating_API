@@ -10,12 +10,17 @@ namespace Api.Repos
     {
         void AddMessage(Message message);
         void DeleteMessage(Message message);
-        Task<MessageReadDto> GetMessage(int id,int accountId);
+        Task<MessageReadDto> GetMessage(int id, int accountId);
         Task<PagedList<MessageReadDto>> GetMessages(UserParams userParams, int accountId, int userId);
         Task<UserChatDto> GetUserInfo(int Id);
-        void ReadMessages(int accountId,int userId);
+        void ReadMessages(int accountId, int userId);
         Task<IEnumerable<UserList>> GetUsersList(int accountId);
-        
+
+        Task<Group> GetMessageGroup(string groupName);
+        Task<Group> GetGroupForConnection(string connectionId);
+        Task<Connection> GetConnection(string connectionId);
+        void RemoveConnection(Connection connection);
+        void AddGroup(Group group);
 
         Task<bool> SaveChanges();
 
