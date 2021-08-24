@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using Api.Interface;
 using Api.Repos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.SignalR
 {
@@ -32,7 +33,7 @@ namespace Api.SignalR
 
         public override async Task OnConnectedAsync()
         {
-           
+
             var httpContext = Context.GetHttpContext();
             var otherUser = httpContext.Request.Query["otherUsername"].ToString();
             var user = await UserRepo.GetUserByUsername(Context.User.GetUsername());
@@ -54,26 +55,26 @@ namespace Api.SignalR
         }
 
         public async Task SendMessage(MessageAddDto createMessageDto)
-          {
-               var user = await UserRepo.GetUserByUsername(Context.User.GetUsername());
-            
- 
-            if (user.Id  == createMessageDto.RecipientId)
+        {
+            var user = await UserRepo.GetUserByUsername(Context.User.GetUsername());
+
+
+            if (user.Id == createMessageDto.RecipientId)
                 throw new HubException("You cannot send messages to yourself");
 
-           
+
             var recipient = await _unitOfWork.UserRepository.GetUser(createMessageDto.RecipientId);
 
             if (recipient == null) throw new HubException("Not found user");
 
             var message = new Message
             {
-                 
-               
+
+
                 SenderId = user.Id,
                 RecipientId = recipient.Id,
                 Text = createMessageDto.Text
-                
+
             };
 
             var groupName = GetGroupName(user.Id.ToString(), recipient.Id.ToString());
@@ -90,18 +91,52 @@ namespace Api.SignalR
                 if (connections != null)
                 {
                     await _presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived",
-                        new { UserId = user.Id, 
-                              KnownAs = $"{user.FirstName} {user.LastName}", 
-                              Text = createMessageDto.Text
-                         });
-                } 
+                        new
+                        {
+                            UserId = user.Id,
+                            KnownAs = $"{user.FirstName} {user.LastName}",
+                            Text = createMessageDto.Text
+                        });
+                }
             }
 
             _unitOfWork.MessageRepository.AddMessage(message);
 
             if (await _unitOfWork.Complete())
             {
-                await Clients.Group(groupName).SendAsync("NewMessage", _mapper.Map<MessageReadDto>(message));
+                await Clients.Group(groupName).SendAsync("NewMessage",
+                 await _unitOfWork.
+                 MessageRepository.
+                 GetMessage(message.Id, 0));
+            }
+        }
+
+        public async Task DeleteMessage(int MesssageId)
+        {
+            var user = await UserRepo.GetUserByUsername(Context.User.GetUsername());
+            var message = await _unitOfWork.MessageRepository.GetMessage(MesssageId, user.Id);
+            var mappedMessage = _mapper.Map<Message>(message);
+            var RecipientId = mappedMessage.RecipientId;
+
+            _unitOfWork.MessageRepository.DeleteMessage(mappedMessage);
+            // if (user.Id  == createMessageDto.RecipientId)
+            //     throw new HubException("You cannot send messages to yourself");
+
+
+
+            if (RecipientId == 0) throw new HubException("Not found user");
+
+
+
+            var groupName = GetGroupName(user.Id.ToString(), RecipientId.ToString());
+
+            var group = await _unitOfWork.MessageRepository.GetMessageGroup(groupName);
+
+
+
+            if (await _unitOfWork.Complete())
+            {
+                await Clients.Group(groupName).SendAsync("OnDeleteMessage", MesssageId);
             }
         }
        
