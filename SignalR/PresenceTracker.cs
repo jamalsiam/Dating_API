@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Api.SignalR
 {
-   public class PresenceTracker
+    public class PresenceTracker
     {
         private static readonly Dictionary<int, List<string>> OnlineUsers =
             new Dictionary<int, List<string>>();
@@ -30,6 +30,11 @@ namespace Api.SignalR
             return Task.FromResult(isOnline);
         }
 
+        public bool CheckUserOnline(int userId)
+        {
+            if (OnlineUsers.ContainsKey(userId)) return true;
+            return false;
+        }
         public Task<bool> UserDisconnected(int userId, string connectionId)
         {
             bool isOffline = false;
@@ -70,4 +75,4 @@ namespace Api.SignalR
             return Task.FromResult(connectionIds);
         }
     }
-} 
+}

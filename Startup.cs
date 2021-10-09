@@ -68,6 +68,7 @@ namespace Api
                 endpoints.MapControllers();
                 endpoints.MapHub<PresenceHub>("hubs/presence");
                 endpoints.MapHub<MessageHub>("hubs/message");
+                endpoints.MapHub<CallHub>("hubs/call");
                 // endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
